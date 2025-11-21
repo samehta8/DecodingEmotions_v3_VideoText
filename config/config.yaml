@@ -1,5 +1,5 @@
 paths:
-  metadata_path: "../data_saumya/meta_emotions.csv"
+  metadata_path: "data/meta_emotions.csv"
   
   # path to external drive on Linux
   #video_path: "/media/max/Elements/videos_events_sample"
@@ -9,10 +9,10 @@ paths:
   
   # dummy videos on localhost max
   #video_path: "/home/max/drive/projects/3_Creativity/creativity-rating-app/videos_all/"
-  video_path: "../data_saumya/videos/"
+  video_path: "data/videos/"
 
   # Familiarization videos (always the same 3 videos for all users)
-  familiarization_video_path: "../data_saumya/videos_familiarization"
+  familiarization_video_path: "data/videos_familiarization"
 
 settings:
   min_ratings_per_video: 2

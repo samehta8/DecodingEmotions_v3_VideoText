@@ -1,0 +1,65 @@
+id,AthleteName,Nationality,LowHighPD,Gender,OlympicParalympic,WinLose,Condition
+_0037_Screenshot_Face,Beatriz Souza,BRA,High,Female,Olympic,Win,Image_Slider
+_0003_Screenshot_Face,Shirine Boukli,FRA,High,Female,Olympic,Win,Image_Slider
+_0018_Screenshot_Face,Eteri Liparteliani,GEO,High,Female,Olympic,Loss,Image_Slider
+_0036_Screenshot_Face,Rika Takayama,JPN,High,Female,Olympic,Loss,Image_Slider
+_0121_Screenshot_Face,Alana Maldanado,BRA,High,Female,Paralympic,Win,Image_Slider
+_0103_Screenshot_Face,Anastasiia Harnyk,UKR,High,Female,Paralympic,Win,Image_Slider
+_0128_Screenshot_Face,Sheyla Hernandez Estupinan,CUB,High,Female,Paralympic,Loss,Image_Slider
+_0113_Screenshot_Face,Yuliia Ivanytska,UKR,High,Female,Paralympic,Loss,Image_Slider
+_0052_Screenshot_Face,Denis Vieru,MDA,High,Male,Olympic,Win,Image_Slider
+_0049_Screenshot_Face,Hifumi Abe,JPN,High,Male,Olympic,Win,Image_Slider
+_0080_Screenshot_Face,Minjong Kim,KOR,High,Male,Olympic,Loss,Image_Slider
+_0503_Screenshot_Face,Ronald Kwemoi,KEN,High,Male,Olympic,Loss,Image_Slider
+_0172_Screenshot_Face,Marcelo Casanova,BRA,High,Male,Paralympic,Win,Image_Slider
+_0171_Screenshot_Face,Davurkhon Karamatov,UZB,High,Male,Paralympic,Win,Image_Slider
+_0170_Screenshot_Face,Helios Latchoumanaya,FRA,High,Male,Paralympic,Loss,Image_Slider
+_0134_Screenshot_Face,Mexsam Banitaba,IRI,High,Male,Paralympic,Loss,Image_Slider
+_0013_Screenshot_Face,Christa Deguchi,CAN,Low,Female,Olympic,Win,Image_Slider
+_0447_Screenshot_Face,Sunisa Lee,USA,Low,Female,Olympic,Win,Image_Slider
+_0441_Screenshot_Face,Annette Nneka Echikunwoke,USA,Low,Female,Olympic,Loss,Image_Slider
+_0035_Screenshot_Face,Anna-Maria Wagner,GER,Low,Female,Olympic,Loss,Image_Slider
+_0469_Screenshot_Face,Samantha Kinghorn,GBR,Low,Female,Paralympic,Win,Image_Slider
+_0494_Screenshot_Face,Natalija Eder,AUT,Low,Female,Paralympic,Win,Image_Slider
+_0089_Screenshot_Face,Rocio Ledesma Dure,ARG,Low,Female,Paralympic,Loss,Image_Slider
+_0226_Screenshot_Face,Zoe Newson,GBR,Low,Female,Paralympic,Loss,Image_Slider
+_0357_Screenshot_Face,Stephen Nedoroscik,USA,Low,Male,Olympic,Win,Image_Slider
+_0328_Screenshot_Face,Nethaneel Mitchell-Blake,GBR,Low,Male,Olympic,Win,Image_Slider
+_0077_Screenshot_Face,Daniel Eich,SUI,Low,Male,Olympic,Loss,Image_Slider
+_0347_Screenshot_Face,Bence Halasz,HUN,Low,Male,Olympic,Loss,Image_Slider
+_0397_Screenshot_Face,Blake Leeper,USA,Low,Male,Paralympic,Win,Image_Slider
+_0385_Screenshot_Face,Reece Langdon,AUS,Low,Male,Paralympic,Win,Image_Slider
+_0378_Screenshot_Face,Daniel Wagner,DEN,Low,Male,Paralympic,Loss,Image_Slider
+_0384_Screenshot_Face,Nate Riech,CAN,Low,Male,Paralympic,Loss,Image_Slider
+_0448,Simone Biles,USA,Low,Female,Olympic,Win,Video_Slider
+_0199,Emily Jade Campbell,GBR,Low,Female,Olympic,Win,Video_Slider
+_0026,Miriam Butkereit,GER,Low,Female,Olympic,Loss,Video_Slider
+_0032,Inbar Lanir,ISR,Low,Female,Olympic,Loss,Video_Slider
+_0481,Susannah Scaroni,USA,Low,Female,Paralympic,Win,Video_Slider
+_0471,Martina Caironi,ITA,Low,Female,Paralympic,Win,Video_Slider
+_0092,Maria Liana Mutia,USA,Low,Female,Paralympic,Loss,Video_Slider
+_0475,Kimberly Alkemade,NED,Low,Female,Paralympic,Loss,Video_Slider
+_0075,Peter Paltchik,ISR,Low,Male,Olympic,Win,Video_Slider
+_0321,Brendon Rodney,CAN,Low,Male,Olympic,Win,Video_Slider
+_0355,Jake Jarman,GBR,Low,Male,Olympic,Loss,Video_Slider
+_0312_Loss,Jakob Ingebrigsen,NOR,Low,Male,Olympic,Loss,Video_Slider
+_0400,Jeremy Campbell,USA,Low,Male,Paralympic,Win,Video_Slider
+_0368,Jaydin Blackwell,USA,Low,Male,Paralympic,Win,Video_Slider
+_0362,Salum Ageze Kashafali,NOR,Low,Male,Paralympic,Loss,Video_Slider
+_0174,Simone Cannizzaro,ITA,Low,Male,Paralympic,Loss,Video_Slider
+_0185,Shifang Luo,CHN,High,Female,Olympic,Win,Video_Slider
+_0015,Haruka Funakubo,JPN,High,Female,Olympic,Win,Video_Slider
+_0041,Kayra Ozdemir,TUR,High,Female,Olympic,Loss,Video_Slider
+_0005,Laura Martinez Abelenda,ESP,High,Female,Olympic,Loss,Video_Slider
+_0129,Wang Hongyu,CHN,High,Female,Paralympic,Win,Video_Slider
+_0124,Ina Kaldani,GEO,High,Female,Paralympic,Win,Video_Slider
+_0125,Kelly Victorio,BRA,High,Female,Paralympic,Loss,Video_Slider
+_0131,Duesadaf Karimova,AZE,High,Female,Paralympic,Loss,Video_Slider
+_0051,Gusmann Kyrgyzbayev,KAZ,High,Male,Olympic,Win,Video_Slider
+_0079,Teddy Riner,FRA,High,Male,Olympic,Win,Video_Slider
+_0060,Akil Gjakova,KOS,High,Male,Olympic,Loss,Video_Slider
+_0202,Theerapong Silachai,THA,High,Male,Olympic,Loss,Video_Slider
+_0133,Abdelkader Bouamer,ALG,High,Male,Paralympic,Win,Video_Slider
+_0142,Djibrilo Iafa,POR,High,Male,Paralympic,Win,Video_Slider
+_0150,Yasin Cimciler,TUR,High,Male,Paralympic,Loss,Video_Slider
+_0156,Ganbat Dashtseren,MGL,High,Male,Paralympic,Loss,Video_Slider
