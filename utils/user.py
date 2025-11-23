@@ -1,12 +1,13 @@
 """
 User class for storing demographic and experience data.
 """
+import random
+import string
 
 class User:
     """
     Stores demographic and experience data for a user/rater.
-    User ID is constructed from parent name initials, birthdate, birth year, and siblings.
-    Formula: mother_initials + father_initials + (day+month) + (cross_sum_of_year * (siblings+1))
+    User ID is randomly generated as 4 letters + 2 digits (e.g., ABCD12).
     """
     def __init__(self):
         self.user_id = ''
@@ -19,38 +20,41 @@ class User:
         self.coach_exp = 0
         self.watch_exp = 0
         self.license = 'Not specified'
-        # User ID components
-        self.mother_initials = ''  # First two letters of mother's given name
-        self.father_initials = ''  # First two letters of father's given name
-        self.siblings = 0          # Number of siblings
-        self.birth_day = 0         # Day of birth
-        self.birth_month = 0       # Month of birth
-        self.birth_year = 0        # Year of birth
 
-    def _calculate_cross_sum(self, number):
-        """Calculate the cross sum (sum of digits) of a number."""
-        return sum(int(digit) for digit in str(abs(number)))
-
-    def set_user_id(self):
+    def generate_random_user_id(self, existing_user_ids=None):
         """
-        Generate user_id from components.
-        Format: mother_initials + father_initials + (day+month) + (cross_sum_year * (siblings+1))
+        Generate a random user ID: 4 uppercase letters + 2 digits (e.g., ABCD12).
+        Ensures the generated ID doesn't already exist in the system.
+
+        Parameters:
+        - existing_user_ids: List of existing user IDs to avoid duplicates
+
+        Returns:
+        - Generated user ID string
         """
-        if not self.mother_initials or not self.father_initials:
-            self.user_id = 'unknown'
-            return
+        if existing_user_ids is None:
+            existing_user_ids = []
 
-        # Calculate day+month sum
-        date_sum = self.birth_day + self.birth_month
+        max_attempts = 1000  # Prevent infinite loop
+        attempts = 0
 
-        # Calculate cross sum of birth year
-        year_cross_sum = self._calculate_cross_sum(self.birth_year)
+        while attempts < max_attempts:
+            # Generate 4 random uppercase letters
+            letters = ''.join(random.choices(string.ascii_uppercase, k=4))
+            # Generate 2 random digits
+            digits = ''.join(random.choices(string.digits, k=2))
+            # Combine
+            new_id = letters + digits
 
-        # Calculate final component: cross_sum * (siblings + 1)
-        sibling_factor = year_cross_sum * (self.siblings + 1)
+            # Check if ID already exists
+            if new_id not in existing_user_ids:
+                self.user_id = new_id
+                return new_id
 
-        # Concatenate all parts
-        self.user_id = f"{self.mother_initials}{self.father_initials}{date_sum}{sibling_factor}"
+            attempts += 1
+
+        # Fallback if somehow we can't generate a unique ID (very unlikely)
+        raise Exception("Failed to generate unique user ID after 1000 attempts")
 
     def set_field_value(self, field_name, value):
         """Set the value for a specific field and update User object."""
@@ -71,36 +75,6 @@ class User:
             self.watch_exp = int(value) if value else 0
         elif field_name == 'license':
             self.license = value
-        elif field_name == 'mother_initials':
-            self.mother_initials = value[:2].lower() if value else ''
-            self.set_user_id()
-        elif field_name == 'father_initials':
-            self.father_initials = value[:2].lower() if value else ''
-            self.set_user_id()
-        elif field_name == 'siblings':
-            try:
-                self.siblings = int(value) if value else 0
-            except ValueError:
-                self.siblings = 0
-            self.set_user_id()
-        elif field_name == 'birth_day':
-            try:
-                self.birth_day = int(value) if value else 0
-            except ValueError:
-                self.birth_day = 0
-            self.set_user_id()
-        elif field_name == 'birth_month':
-            try:
-                self.birth_month = int(value) if value else 0
-            except ValueError:
-                self.birth_month = 0
-            self.set_user_id()
-        elif field_name == 'birth_year':
-            try:
-                self.birth_year = int(value) if value else 0
-            except ValueError:
-                self.birth_year = 0
-            self.set_user_id()
 
     def to_dict(self):
         """Convert user data to dictionary for JSON export."""

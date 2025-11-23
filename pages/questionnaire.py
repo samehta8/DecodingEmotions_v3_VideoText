@@ -4,7 +4,7 @@ Dynamically builds form based on config/questionnaire_fields.yaml.
 """
 import streamlit as st
 from utils.config_loader import load_questionnaire_fields
-from utils.data_persistence import save_user_data
+from utils.data_persistence import save_user_data, get_all_existing_user_ids
 
 def show():
     """Display the questionnaire screen."""
@@ -184,12 +184,17 @@ def show_questionnaire_form(fields):
 
         if missing_fields:
             st.error(f"⚠️ Please fill in the following required fields: {', '.join(missing_fields)}")
-        elif not user.user_id or user.user_id == 'unknown':
-            st.error("⚠️ Please ensure all fields are filled in correctly, especially the fields required for user ID generation.")
         else:
-            # Show confirmation panel
-            st.session_state.user_id_confirmed = True
-            st.rerun()
+            # Generate random user ID
+            try:
+                existing_ids = get_all_existing_user_ids()
+                user.generate_random_user_id(existing_ids)
+                # Show confirmation panel
+                st.session_state.user_id_confirmed = True
+                st.rerun()
+            except Exception as e:
+                st.error(f"⚠️ Failed to generate user ID: {e}")
+                print(f"[ERROR] User ID generation failed: {e}")
 
 def show_confirmation_panel():
     """Display the user ID confirmation panel."""

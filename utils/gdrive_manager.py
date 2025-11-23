@@ -5,9 +5,11 @@ Handles connections and file operations with Google Drive.
 import streamlit as st
 import os
 import io
+import time
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.errors import HttpError
 import tempfile
 from pathlib import Path
 
@@ -16,6 +18,10 @@ _gdrive_service = None
 
 # Cache for downloaded videos (filepath -> local temp path)
 _video_cache = {}
+
+# Cache for video listings (folder_id -> (list of videos, timestamp))
+_video_list_cache = {}
+_VIDEO_LIST_CACHE_TTL = 300  # Cache video list for 5 minutes
 
 def get_gdrive_service():
     """
@@ -51,44 +57,85 @@ def get_gdrive_service():
     return _gdrive_service
 
 
-def list_videos_in_folder(folder_id):
+def list_videos_in_folder(folder_id, use_cache=True):
     """
-    List all video files in a Google Drive folder.
+    List all video files in a Google Drive folder with retry logic and caching.
 
     Args:
         folder_id: Google Drive folder ID
+        use_cache: Whether to use cached results (default: True)
 
     Returns:
         List of dicts with 'id', 'name' for each video file, or empty list on error
     """
+    global _video_list_cache
+
+    # Check cache first
+    if use_cache and folder_id in _video_list_cache:
+        cached_videos, cached_time = _video_list_cache[folder_id]
+        if time.time() - cached_time < _VIDEO_LIST_CACHE_TTL:
+            print(f"[INFO] Using cached video list ({len(cached_videos)} videos)")
+            return cached_videos
+
     service = get_gdrive_service()
     if not service:
         print("[ERROR] Cannot list videos - Google Drive service not available")
+        # If we have stale cache, use it as fallback
+        if folder_id in _video_list_cache:
+            print("[WARNING] Using stale cache due to service unavailability")
+            return _video_list_cache[folder_id][0]
         return []
 
-    try:
-        # Query for video files in the folder
-        query = f"'{folder_id}' in parents and (mimeType contains 'video/' or name contains '.mp4')"
+    # Retry logic with exponential backoff
+    max_retries = 3
+    retry_delay = 1  # Start with 1 second
 
-        results = service.files().list(
-            q=query,
-            fields="files(id, name)",
-            pageSize=1000  # Adjust if you have more than 1000 videos
-        ).execute()
+    for attempt in range(max_retries):
+        try:
+            # Query for video files in the folder
+            query = f"'{folder_id}' in parents and (mimeType contains 'video/' or name contains '.mp4')"
 
-        files = results.get('files', [])
-        print(f"[INFO] Found {len(files)} video files in Google Drive folder")
+            results = service.files().list(
+                q=query,
+                fields="files(id, name)",
+                pageSize=1000  # Adjust if you have more than 1000 videos
+            ).execute()
 
-        return files
+            files = results.get('files', [])
+            print(f"[INFO] Found {len(files)} video files in Google Drive folder")
 
-    except Exception as e:
-        print(f"[ERROR] Failed to list videos from Google Drive: {e}")
-        return []
+            # Cache the results
+            _video_list_cache[folder_id] = (files, time.time())
+
+            return files
+
+        except HttpError as e:
+            if attempt < max_retries - 1:
+                print(f"[WARNING] HTTP error listing videos (attempt {attempt + 1}/{max_retries}): {e}")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                print(f"[ERROR] Failed to list videos after {max_retries} attempts: {e}")
+
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"[WARNING] Error listing videos (attempt {attempt + 1}/{max_retries}): {e}")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                print(f"[ERROR] Failed to list videos after {max_retries} attempts: {e}")
+
+    # If all retries failed, check for stale cache
+    if folder_id in _video_list_cache:
+        print("[WARNING] Using stale cache due to repeated failures")
+        return _video_list_cache[folder_id][0]
+
+    return []
 
 
 def download_video_to_temp(file_id, filename):
     """
-    Download a video file from Google Drive to a temporary location.
+    Download a video file from Google Drive to a temporary location with retry logic.
     Uses caching to avoid re-downloading the same file.
 
     Args:
@@ -116,41 +163,60 @@ def download_video_to_temp(file_id, filename):
         print("[ERROR] Cannot download video - Google Drive service not available")
         return None
 
-    try:
-        print(f"[INFO] Downloading video from Google Drive: {filename}")
+    # Retry logic with exponential backoff
+    max_retries = 3
+    retry_delay = 2  # Start with 2 seconds for downloads
 
-        # Request the file
-        request = service.files().get_media(fileId=file_id)
+    for attempt in range(max_retries):
+        try:
+            print(f"[INFO] Downloading video from Google Drive: {filename} (attempt {attempt + 1}/{max_retries})")
 
-        # Create temporary file with proper extension
-        suffix = Path(filename).suffix or '.mp4'
-        temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
-        temp_path = temp_file.name
+            # Request the file
+            request = service.files().get_media(fileId=file_id)
 
-        # Download to temp file
-        fh = io.BytesIO()
-        downloader = MediaIoBaseDownload(fh, request)
+            # Create temporary file with proper extension
+            suffix = Path(filename).suffix or '.mp4'
+            temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
+            temp_path = temp_file.name
 
-        done = False
-        while not done:
-            status, done = downloader.next_chunk()
-            if status:
-                print(f"[INFO] Download progress: {int(status.progress() * 100)}%")
+            # Download to temp file
+            fh = io.BytesIO()
+            downloader = MediaIoBaseDownload(fh, request)
 
-        # Write to temp file
-        fh.seek(0)
-        temp_file.write(fh.read())
-        temp_file.close()
+            done = False
+            while not done:
+                status, done = downloader.next_chunk()
+                if status:
+                    print(f"[INFO] Download progress: {int(status.progress() * 100)}%")
 
-        # Cache the path
-        _video_cache[cache_key] = temp_path
+            # Write to temp file
+            fh.seek(0)
+            temp_file.write(fh.read())
+            temp_file.close()
 
-        print(f"[INFO] Video downloaded successfully: {filename}")
-        return temp_path
+            # Cache the path
+            _video_cache[cache_key] = temp_path
 
-    except Exception as e:
-        print(f"[ERROR] Failed to download video '{filename}': {e}")
-        return None
+            print(f"[INFO] Video downloaded successfully: {filename}")
+            return temp_path
+
+        except HttpError as e:
+            if attempt < max_retries - 1:
+                print(f"[WARNING] HTTP error downloading video (attempt {attempt + 1}/{max_retries}): {e}")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                print(f"[ERROR] Failed to download video '{filename}' after {max_retries} attempts: {e}")
+
+        except Exception as e:
+            if attempt < max_retries - 1:
+                print(f"[WARNING] Error downloading video (attempt {attempt + 1}/{max_retries}): {e}")
+                time.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+            else:
+                print(f"[ERROR] Failed to download video '{filename}' after {max_retries} attempts: {e}")
+
+    return None
 
 
 def get_video_path(filename, folder_id):

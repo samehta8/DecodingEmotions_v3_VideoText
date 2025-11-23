@@ -27,17 +27,20 @@ def show():
         user_id_input = st.text_input(
             "User ID:",
             key="user_id_input",
-            placeholder="Enter your user ID",
+            placeholder="Enter your user ID (e.g., ABCD12 or giha3042)",
             help="Your user ID was shown to you after completing the questionnaire"
-        ).lower().strip()
+        ).strip()
 
         # Check if user ID exists
         if user_id_input:
             if user_exists(user_id_input):
                 st.success(f"✓ User ID '{user_id_input}' found!")
                 st.session_state.user_id_valid = True
+                # Store the user ID as entered (preserve original case)
+                st.session_state.validated_user_id = user_id_input
             else:
                 st.error("⚠️ User ID not found. Please check your ID or select 'No' if this is your first time.")
+                st.info("💡 If you cannot remember your user ID, please reach out to the study administration.")
                 st.session_state.user_id_valid = False
         else:
             st.session_state.user_id_valid = False
@@ -58,13 +61,15 @@ def show():
             if participated == "Yes, I have participated before":
                 if not user_id_input:
                     st.error("Please enter your user ID")
+                    st.info("💡 If you cannot remember your user ID, please reach out to the study administration.")
                     st.stop()
                 elif not st.session_state.get('user_id_valid', False):
                     st.error("User ID not found. Please check your ID.")
+                    st.info("💡 If you cannot remember your user ID, please reach out to the study administration.")
                     st.stop()
                 else:
-                    # Valid returning user
-                    st.session_state.user.user_id = user_id_input
+                    # Valid returning user - use the validated ID with original case
+                    st.session_state.user.user_id = st.session_state.get('validated_user_id', user_id_input)
 
                     # Check if familiarization is enabled
                     config = st.session_state.config

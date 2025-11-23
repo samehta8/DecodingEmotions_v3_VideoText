@@ -137,9 +137,41 @@ def save_rating(user_id, action_id, scale_values):
         print(f"[ERROR] CRITICAL: All storage methods failed for {user_id}_{action_id}")
         return False
 
+def get_all_existing_user_ids():
+    """
+    Get all existing user IDs from the system.
+    Tries both Google Sheets and local JSON, combines results.
+
+    Returns:
+    - List of all unique user IDs
+    """
+    user_ids = set()
+
+    # Try Google Sheets first
+    try:
+        from utils.gsheets_manager import get_all_user_ids_from_gsheets
+        gsheets_ids = get_all_user_ids_from_gsheets(worksheet="users")
+        user_ids.update(gsheets_ids)
+        print(f"[INFO] Retrieved {len(gsheets_ids)} user IDs from Google Sheets")
+    except Exception as e:
+        print(f"[WARNING] Failed to get user IDs from Google Sheets: {e}")
+
+    # Also check local JSON files
+    try:
+        if os.path.exists('user_data'):
+            for filename in os.listdir('user_data'):
+                if filename.endswith('.json'):
+                    user_id = filename.replace('.json', '')
+                    user_ids.add(user_id)
+            print(f"[INFO] Found {len(user_ids)} total unique user IDs")
+    except Exception as e:
+        print(f"[WARNING] Failed to get user IDs from local files: {e}")
+
+    return list(user_ids)
+
 def user_exists(user_id):
     """
-    Check if a user_id exists in the system.
+    Check if a user_id exists in the system (case-insensitive).
     Tries Google Sheets first (primary), falls back to local JSON (backup).
 
     Parameters:
@@ -156,25 +188,40 @@ def user_exists(user_id):
     except Exception as e:
         print(f"[WARNING] Failed to check user existence in Google Sheets: {e}")
 
-    # FALLBACK: Check local JSON files
+    # FALLBACK: Check local JSON files (case-insensitive)
     try:
+        if not os.path.exists('user_data'):
+            return False
+
+        # Check in user_data folder (primary storage for user info) - case insensitive
+        user_id_lower = user_id.lower()
+        for filename in os.listdir('user_data'):
+            if filename.endswith('.json'):
+                file_user_id = filename.replace('.json', '').lower()
+                if file_user_id == user_id_lower:
+                    print(f"[INFO] User {user_id} found in local JSON files")
+                    return True
+
+        # Also check user_ratings as fallback - case insensitive
         if not os.path.exists('user_ratings'):
             return False
 
         user_ratings_files = os.listdir('user_ratings')
-        exists = any(f.startswith(f"{user_id}_") for f in user_ratings_files)
+        for f in user_ratings_files:
+            if '_' in f and f.endswith('.json'):
+                file_user_id = f.split('_')[0].lower()
+                if file_user_id == user_id_lower:
+                    print(f"[INFO] User {user_id} found in local JSON files")
+                    return True
 
-        if exists:
-            print(f"[INFO] User {user_id} found in local JSON files")
-
-        return exists
+        return False
     except Exception as e:
         print(f"[ERROR] Failed to check user existence in both sources: {e}")
         return False
 
 def get_rated_videos_for_user(user_id):
     """
-    Get list of video IDs already rated by a user.
+    Get list of video IDs already rated by a user (case-insensitive).
     Tries Google Sheets first (primary), falls back to local JSON (backup).
 
     Parameters:
@@ -192,19 +239,25 @@ def get_rated_videos_for_user(user_id):
     except Exception as e:
         print(f"[WARNING] Failed to get rated videos from Google Sheets: {e}")
 
-    # FALLBACK: Use local JSON files
+    # FALLBACK: Use local JSON files (case-insensitive)
     try:
         if not os.path.exists('user_ratings'):
             return []
 
         files = os.listdir('user_ratings')
         rated_ids = []
+        user_id_lower = user_id.lower()
 
         for f in files:
-            if f.startswith(f"{user_id}_") and f.endswith('.json'):
-                # Extract action_id from filename: {user_id}_{action_id}.json
-                action_id = f.replace('.json', '').replace(f'{user_id}_', '')
-                rated_ids.append(action_id)
+            if f.endswith('.json') and '_' in f:
+                # Extract user_id from filename (case-insensitive match)
+                file_user_id = f.split('_')[0].lower()
+                if file_user_id == user_id_lower:
+                    # Extract action_id from filename: {user_id}_{action_id}.json
+                    parts = f.replace('.json', '').split('_', 1)
+                    if len(parts) > 1:
+                        action_id = parts[1]
+                        rated_ids.append(action_id)
 
         print(f"[INFO] Retrieved {len(rated_ids)} rated videos from JSON backup for user {user_id}")
         return rated_ids

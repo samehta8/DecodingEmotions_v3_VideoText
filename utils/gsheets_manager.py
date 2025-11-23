@@ -183,7 +183,7 @@ def read_ratings_from_gsheets(worksheet="ratings"):
 
 def get_rated_videos_for_user_from_gsheets(user_id, worksheet="ratings"):
     """
-    Get list of video IDs already rated by a specific user from Google Sheets.
+    Get list of video IDs already rated by a specific user from Google Sheets (case-insensitive).
 
     Parameters:
         user_id: User identifier
@@ -198,8 +198,10 @@ def get_rated_videos_for_user_from_gsheets(user_id, worksheet="ratings"):
         if df.empty or 'user_id' not in df.columns or 'id' not in df.columns:
             return []
 
-        # Filter by user_id
-        user_ratings = df[df['user_id'] == user_id]
+        # Filter by user_id (case-insensitive)
+        user_id_lower = user_id.lower()
+        df['user_id_lower'] = df['user_id'].astype(str).str.lower()
+        user_ratings = df[df['user_id_lower'] == user_id_lower]
 
         # Get unique action IDs
         rated_ids = user_ratings['id'].unique().tolist()
@@ -318,7 +320,7 @@ def read_users_from_gsheets(worksheet="users"):
 
 def user_exists_in_gsheets(user_id, worksheet="users"):
     """
-    Check if a user exists in Google Sheets.
+    Check if a user exists in Google Sheets (case-insensitive).
 
     Parameters:
         user_id: User identifier to check
@@ -333,9 +335,35 @@ def user_exists_in_gsheets(user_id, worksheet="users"):
         if df.empty or 'user_id' not in df.columns:
             return False
 
-        # Check if user_id exists
-        return user_id in df['user_id'].values
+        # Check if user_id exists (case-insensitive)
+        user_id_lower = user_id.lower()
+        df['user_id_lower'] = df['user_id'].astype(str).str.lower()
+        return user_id_lower in df['user_id_lower'].values
 
     except Exception as e:
         print(f"[ERROR] Failed to check user existence in Google Sheets: {e}")
         return False
+
+
+def get_all_user_ids_from_gsheets(worksheet="users"):
+    """
+    Get all user IDs from Google Sheets.
+
+    Parameters:
+        worksheet: Name of worksheet to read from (default: "users")
+
+    Returns:
+        List of all user IDs
+    """
+    try:
+        df = read_users_from_gsheets(worksheet=worksheet)
+
+        if df.empty or 'user_id' not in df.columns:
+            return []
+
+        # Get all unique user IDs
+        return df['user_id'].dropna().unique().tolist()
+
+    except Exception as e:
+        print(f"[ERROR] Failed to get all user IDs from Google Sheets: {e}")
+        return []

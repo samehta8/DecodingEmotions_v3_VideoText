@@ -367,7 +367,17 @@ def display_rating_interface(action_id, video_filename, config):
         video_file_path = get_video_path(video_filename, folder_id)
 
         if not video_file_path:
-            st.error(f"Failed to load video from Google Drive: {video_filename}")
+            st.error(f"⚠️ Failed to load video from Google Drive: {video_filename}")
+            st.warning("This video could not be loaded due to a network error. You can skip this video and continue with the next one.")
+
+            # Add skip button
+            col1, col2, col3 = st.columns([1, 1, 1])
+            with col2:
+                if st.button("Skip to Next Video", use_container_width=True, type="primary"):
+                    # Move to next video
+                    st.session_state.current_video_index = st.session_state.get('current_video_index', 0) + 1
+                    st.rerun()
+
             return {}
 
         # For Google Drive, pass the parent directory of the temp file
