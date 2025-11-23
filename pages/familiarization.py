@@ -67,6 +67,84 @@ def display_video_with_mode(video_file_path, playback_mode='loop'):
         # Fallback to default
         st.video(video_file_path)
 
+def _validate_familiarization_ratings(scale_values):
+    """
+    Validate that all required ratings are provided for familiarization trials.
+    Checks both individual required scales and group requirements.
+
+    Returns:
+        List of error messages (empty if validation passes)
+    """
+    errors = []
+
+    # Check individually required scales (not in groups)
+    required_scales = st.session_state.get('required_scales', [])
+    missing_scales = [
+        title for title in required_scales
+        if scale_values.get(title) is None or scale_values.get(title) == ''
+    ]
+
+    if missing_scales:
+        errors.append(f"Required fields: {', '.join(missing_scales)}")
+
+    # Check group requirements
+    group_requirements = st.session_state.get('group_requirements', {})
+    rating_scales = st.session_state.get('rating_scales', [])
+
+    for group_id, group_info in group_requirements.items():
+        required_count = group_info['number_of_ratings']
+        error_msg = group_info.get('error_msg', '')
+        group_title = group_info.get('title', group_id)
+
+        # Find all scales in this group
+        group_scales = [
+            scale for scale in rating_scales
+            if scale.get('group') == group_id
+        ]
+
+        # Count how many scales in this group have been changed
+        changed_count = 0
+        for scale in group_scales:
+            title = scale.get('title')
+            value = scale_values.get(title)
+
+            # Check if value exists and is not empty
+            if value is None or value == '':
+                continue
+
+            # For sliders, check if value has been changed from initial position
+            if scale.get('type') == 'slider':
+                initial_state = scale.get('initial_state', 'low')
+                slider_min = scale.get('slider_min', 0)
+                slider_max = scale.get('slider_max', 100)
+
+                # Calculate initial value based on initial_state
+                if initial_state == 'low':
+                    initial_value = slider_min
+                elif initial_state == 'high':
+                    initial_value = slider_max
+                else:  # center
+                    initial_value = (slider_min + slider_max) / 2
+
+                # Count as changed if value is different from initial
+                if value != initial_value:
+                    changed_count += 1
+            else:
+                # For discrete and text types, any non-empty value counts as changed
+                changed_count += 1
+
+        if changed_count < required_count:
+            # Use custom error message if provided, otherwise use default
+            if error_msg:
+                errors.append(error_msg)
+            else:
+                errors.append(
+                    f"Group '{group_title}': Please rate at least {required_count} emotions "
+                    f"(currently {changed_count}/{required_count})"
+                )
+
+    return errors
+
 def show():
     """Display the familiarization trials screen."""
     user = st.session_state.user
@@ -247,15 +325,12 @@ def display_familiarization_interface(video_filename, config):
     with col3:
         if st.button("Continue ▶️", use_container_width=True, type="primary"):
             # Validate ratings (same validation as main rating screen)
-            # Check that all required scales have values
-            required_scales = st.session_state.required_scales
-            missing_scales = [
-                title for title in required_scales
-                if scale_values.get(title) is None or scale_values.get(title) == ''
-            ]
+            validation_errors = _validate_familiarization_ratings(scale_values)
 
-            if missing_scales:
-                st.error(f"⚠️ Please provide ratings for all required scales: {', '.join(missing_scales)}")
+            if validation_errors:
+                st.error("⚠️ Please complete the required ratings:")
+                for error in validation_errors:
+                    st.warning(error)
                 st.stop()
 
             # Don't save rating - just move to next video

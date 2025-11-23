@@ -9,18 +9,21 @@
 # - title: descriptive name (for documentation purposes)
 # - id: unique identifier used to reference this group
 # - number_of_ratings: how many scales from this group must be rated to proceed
+# - error_msg: custom error message shown when requirement not met
 #
 # Example:
 # groups:
 #   - title: "Emotion Ratings"
 #     id: "emotions"
 #     number_of_ratings: 3
+#     error_msg: "Please rate at least 3 different emotions before proceeding"
 # ============================================================================
 
 groups:
   - title: "Emotions"
     id: "emotions"
     number_of_ratings: 1
+    error_msg: "Please rate at least one emotion or Neutral before proceeding."
 
 # ============================================================================
 # RATING SCALES

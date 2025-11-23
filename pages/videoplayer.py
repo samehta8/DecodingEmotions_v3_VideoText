@@ -466,7 +466,11 @@ def _validate_ratings(scale_values):
     group_requirements = st.session_state.get('group_requirements', {})
     rating_scales = st.session_state.get('rating_scales', [])
 
-    for group_id, required_count in group_requirements.items():
+    for group_id, group_info in group_requirements.items():
+        required_count = group_info['number_of_ratings']
+        error_msg = group_info.get('error_msg', '')
+        group_title = group_info.get('title', group_id)
+
         # Find all scales in this group
         group_scales = [
             scale for scale in rating_scales
@@ -505,16 +509,14 @@ def _validate_ratings(scale_values):
                 changed_count += 1
 
         if changed_count < required_count:
-            # Find group title for error message
-            group_title = next(
-                (g.get('title', group_id) for g in st.session_state.get('rating_groups', [])
-                 if g.get('id') == group_id),
-                group_id
-            )
-            errors.append(
-                f"Group '{group_title}': Please rate at least {required_count} emotions "
-                f"(currently {changed_count}/{required_count})"
-            )
+            # Use custom error message if provided, otherwise use default
+            if error_msg:
+                errors.append(error_msg)
+            else:
+                errors.append(
+                    f"Group '{group_title}': Please rate at least {required_count} emotions "
+                    f"(currently {changed_count}/{required_count})"
+                )
 
     return errors
 

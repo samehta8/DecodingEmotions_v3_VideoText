@@ -73,8 +73,13 @@ def load_rating_scales(config):
         for group in groups:
             group_id = group.get('id')
             number_of_ratings = group.get('number_of_ratings', 0)
+            error_msg = group.get('error_msg', '')
             if group_id:
-                group_requirements[group_id] = number_of_ratings
+                group_requirements[group_id] = {
+                    'number_of_ratings': number_of_ratings,
+                    'error_msg': error_msg,
+                    'title': group.get('title', group_id)
+                }
 
         # Parse scales
         all_scales = data.get('scales', [])
@@ -106,13 +111,14 @@ def _validate_group_requirements(scales, groups, group_requirements):
             group_scale_counts[group_id] = group_scale_counts.get(group_id, 0) + 1
 
     # Check each group
-    for group_id, required_ratings in group_requirements.items():
+    for group_id, group_info in group_requirements.items():
+        required_ratings = group_info['number_of_ratings']
         scale_count = group_scale_counts.get(group_id, 0)
 
         if scale_count == 0:
             print(f"[WARNING] Rating scale group '{group_id}' has no active scales assigned to it")
         elif required_ratings > scale_count:
-            group_title = next((g.get('title', group_id) for g in groups if g.get('id') == group_id), group_id)
+            group_title = group_info['title']
             print(f"[WARNING] Rating scale group '{group_title}' (id: {group_id}) requires {required_ratings} ratings but only has {scale_count} scales. All scales in this group will be required.")
             # Update to require all scales
-            group_requirements[group_id] = scale_count
+            group_requirements[group_id]['number_of_ratings'] = scale_count
