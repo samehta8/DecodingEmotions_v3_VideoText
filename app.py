@@ -3,11 +3,17 @@ Creativity Rating App - Streamlit Version
 
 Main application file with navigation and session state management.
 """
-import streamlit as st
-
 import os
 import sys
 
+# CRITICAL: Prevent segfaults on Streamlit Cloud
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['ARROW_PRE_0_15_IPC_FORMAT'] = '1'
+
+import streamlit as st
 # Add utils to path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
 
@@ -17,7 +23,7 @@ from utils.config_loader import load_config
 # Page configuration
 st.set_page_config(
     page_title="Decoding Emotions App",
-    page_icon="",
+    page_icon="🎭",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
