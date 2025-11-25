@@ -45,8 +45,8 @@ scales:
 - active: true
   type: "slider"
   title: "Angry"
-  label_low: "not angry"
-  label_high: "very angry"
+  label_low: ""
+  label_high: ""
   slider_min: 0
   slider_max: 100
   initial_state: "low"
@@ -56,8 +56,8 @@ scales:
 - active: true
   type: "slider"
   title: "Happy"
-  label_low: "not happy"
-  label_high: "very happy"
+  label_low: ""
+  label_high: ""
   slider_min: 0
   slider_max: 100
   initial_state: "low"
@@ -67,8 +67,8 @@ scales:
 - active: true
   type: "slider"
   title: "Sad"
-  label_low: "not sad"
-  label_high: "very sad"
+  label_low: ""
+  label_high: ""
   slider_min: 0
   slider_max: 100
   initial_state: "low"

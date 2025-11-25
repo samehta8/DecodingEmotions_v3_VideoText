@@ -139,63 +139,121 @@ def display_video_rating_interface(
                 label_high = scale_config.get('label_high', '')
                 required = scale_config.get('required_to_proceed', True)
 
-                # Display scale title and labels
-                st.markdown(f"**{title}** {'*(required)*' if required else ''}")
+                # Check if both labels are empty (saves vertical space)
+                labels_empty = not label_low and not label_high
 
-                col_low, col_scale, col_high = st.columns([1, 3, 1])
+                if labels_empty:
+                    # Side-by-side layout: title on left, scale on right
+                    col_title, col_scale = st.columns([1, 3])
 
-                with col_low:
-                    st.markdown(f"*{label_low}*")
+                    with col_title:
+                        st.markdown(f"**{title}** {'*(required)*' if required else ''}")
 
-                with col_scale:
-                    # Generate unique key for this scale
-                    unique_key = f"{key_prefix}{video_filename}_{title}" if not action_id else f"{key_prefix}{action_id}_{title}"
+                    with col_scale:
+                        # Generate unique key for this scale
+                        unique_key = f"{key_prefix}{video_filename}_{title}" if not action_id else f"{key_prefix}{action_id}_{title}"
 
-                    if scale_type == 'discrete':
-                        values = scale_config.get('values', [1, 2, 3, 4, 5, 6, 7])
-                        selected = st.pills(
-                            label=title,
-                            options=values,
-                            key=unique_key,
-                            label_visibility="collapsed",
-                            width="stretch"
-                        )
-                        scale_values[title] = selected
+                        if scale_type == 'discrete':
+                            values = scale_config.get('values', [1, 2, 3, 4, 5, 6, 7])
+                            selected = st.pills(
+                                label=title,
+                                options=values,
+                                key=unique_key,
+                                label_visibility="collapsed",
+                                selection_mode="single"
+                            )
+                            scale_values[title] = selected
 
-                    elif scale_type == 'slider':
-                        slider_min = scale_config.get('slider_min', 0)
-                        slider_max = scale_config.get('slider_max', 100)
-                        initial_state = scale_config.get('initial_state', 'low')
+                        elif scale_type == 'slider':
+                            slider_min = scale_config.get('slider_min', 0)
+                            slider_max = scale_config.get('slider_max', 100)
+                            initial_state = scale_config.get('initial_state', 'low')
 
-                        # Calculate initial value based on initial_state
-                        if initial_state == 'low':
-                            initial_value = float(slider_min)
-                        elif initial_state == 'high':
-                            initial_value = float(slider_max)
-                        else:  # 'center' or any other value defaults to center
-                            initial_value = float(slider_min + slider_max) / 2
+                            # Calculate initial value based on initial_state
+                            if initial_state == 'low':
+                                initial_value = float(slider_min)
+                            elif initial_state == 'high':
+                                initial_value = float(slider_max)
+                            else:  # 'center' or any other value defaults to center
+                                initial_value = float(slider_min + slider_max) / 2
 
-                        selected = st.slider(
-                            label=title,
-                            min_value=float(slider_min),
-                            max_value=float(slider_max),
-                            value=initial_value,
-                            key=unique_key,
-                            label_visibility="collapsed"
-                        )
-                        scale_values[title] = selected
+                            selected = st.slider(
+                                label=title,
+                                min_value=float(slider_min),
+                                max_value=float(slider_max),
+                                value=initial_value,
+                                key=unique_key,
+                                label_visibility="collapsed"
+                            )
+                            scale_values[title] = selected
 
-                    elif scale_type == 'text':
-                        selected = st.text_input(
-                            label=title,
-                            key=unique_key,
-                            placeholder="Enter your response...",
-                            label_visibility="collapsed"
-                        )
-                        scale_values[title] = selected if selected else None
+                        elif scale_type == 'text':
+                            selected = st.text_input(
+                                label=title,
+                                key=unique_key,
+                                placeholder="Enter your response...",
+                                label_visibility="collapsed"
+                            )
+                            scale_values[title] = selected if selected else None
 
-                with col_high:
-                    st.markdown(f"*{label_high}*")
+                else:
+                    # Stacked layout with labels: title on top, labels on sides of scale
+                    st.markdown(f"**{title}** {'*(required)*' if required else ''}")
+
+                    col_low, col_scale, col_high = st.columns([1, 3, 1])
+
+                    with col_low:
+                        st.markdown(f"*{label_low}*")
+
+                    with col_scale:
+                        # Generate unique key for this scale
+                        unique_key = f"{key_prefix}{video_filename}_{title}" if not action_id else f"{key_prefix}{action_id}_{title}"
+
+                        if scale_type == 'discrete':
+                            values = scale_config.get('values', [1, 2, 3, 4, 5, 6, 7])
+                            selected = st.pills(
+                                label=title,
+                                options=values,
+                                key=unique_key,
+                                label_visibility="collapsed",
+                                selection_mode="single"
+                            )
+                            scale_values[title] = selected
+
+                        elif scale_type == 'slider':
+                            slider_min = scale_config.get('slider_min', 0)
+                            slider_max = scale_config.get('slider_max', 100)
+                            initial_state = scale_config.get('initial_state', 'low')
+
+                            # Calculate initial value based on initial_state
+                            if initial_state == 'low':
+                                initial_value = float(slider_min)
+                            elif initial_state == 'high':
+                                initial_value = float(slider_max)
+                            else:  # 'center' or any other value defaults to center
+                                initial_value = float(slider_min + slider_max) / 2
+
+                            selected = st.slider(
+                                label=title,
+                                min_value=float(slider_min),
+                                max_value=float(slider_max),
+                                value=initial_value,
+                                key=unique_key,
+                                label_visibility="collapsed"
+                            )
+                            scale_values[title] = selected
+
+                        elif scale_type == 'text':
+                            selected = st.text_input(
+                                label=title,
+                                key=unique_key,
+                                placeholder="Enter your response...",
+                                label_visibility="collapsed"
+                            )
+                            scale_values[title] = selected if selected else None
+
+                    with col_high:
+                        st.markdown(f"*{label_high}*")
 
                 st.markdown("")  # Spacing
 
