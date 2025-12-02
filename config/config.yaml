@@ -2,7 +2,7 @@ paths:
   metadata_path: "data/meta_emotions.csv"
 
   # Consent form PDF path
-  consent_pdf_path: "data/consent_dummy.pdf"
+  consent_pdf_path: "data/consent.pdf"
 
   # Video source: "local" only (Google Drive support removed)
   # - "local": Load videos from local filesystem (video_path)

@@ -31,7 +31,7 @@ def show():
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
             st.download_button(
-                label="📄 Download Participant Information",
+                label="📄 View Consent Form Details",
                 data=pdf_bytes,
                 file_name="participant_information.pdf",
                 mime="application/pdf",
@@ -50,10 +50,19 @@ def show():
 
     # Consent checkbox
     consent_given = st.checkbox(
-        "**I confirm that I have read and understood the participant information document, and I consent to participate in this study**",
+        "**I confirm that**",
         key="consent_checkbox"
     )
 
+    st.markdown("""
+
+                1. I have read and understood the participant information above
+                2. I consent to participate in this research study voluntarily
+                3. I consent to the processing of my data anonymously for research purposes
+                4. I consent to being contacted via email for potential follow-up questions
+                5. I am at least 18 years old
+                """)
+    
     st.markdown("")
     st.markdown("")
 
