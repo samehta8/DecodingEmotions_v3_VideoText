@@ -31,9 +31,12 @@ def show():
     """)
     
     st.warning("""
-    **Neutral emotion is used when you do not see any specific emotion on the athlete. **
-    It can be used with other emotions but cannot be 100. 
+    **Neutral emotion is used when you do not see any specific emotion on the athlete.** 
+    
+    It can be used with other emotions but cannot be 100 if used with other emotions. 
+    
     E.g. Surprised 30, Sad 20 and Neutral **20** is accepted, but Surprised 30 and Neutral 100 is not accepted. 
+    
     **WHILE NEUTRAL CAN BE COMBINED WITH OTHER EMOTIONS, DO NOT SELECT NEUTRAL 100 IF OTHER EMOTIONS ARE PRESENT**
     
     Thus, Neutral would be 0 if other emotions are present, and 100 if no other emotions are visible or present according to you. Any score in between can be combined with other emotions.
