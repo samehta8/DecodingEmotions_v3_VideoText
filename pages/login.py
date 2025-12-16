@@ -10,17 +10,18 @@ def show():
     st.markdown("""
     ## Welcome!
 
-    Thanks for participating in this study! If you have participated before, please enter your user ID below to directly 
-    proceed to the rating task.  
+    Thanks for your participation! 
     
-    If this is your first time, you will be forwarded to receive more information about the study and will need to provide your consent 
+    If you have participated before, please enter your user ID below to directly 
+    continue where you left off.  
+    
+    If you are a new participant, you will first receive more information about the study and will need to provide your consent 
     before proceeding.
     
-    Afterwards, you will complete a brief demographic questionnaire. The information given in the questionnaire will not be linked 
+    Next, you will complete a brief demographic questionnaire. The information given in the questionnaire will not be linked 
     to your identity and is very important for putting the study results into context. 
                 
-    After the questionnaire, you will have the opportunity to familiarize yourself with the rating interface through some practice trials 
-    before proceeding to the main rating task.
+    Finally, **before starting the main task, you will receive 3 practice trials** to get used to the survey!
 
     ### Important Notes:
 
