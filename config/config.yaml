@@ -13,7 +13,7 @@ paths:
   #video_path: "data/videos_screenshots/" # use for image study
 
   # Familiarization videos (always the same 3 videos for all users)
-  familiarization_video_path: "data/videos_familiarization_screenshots" # use for video study
+  familiarization_video_path: "data/videos_familiarization_videos" # use for video study
   #familiarization_video_path: "data/videos_familiarization" # use for image study
 
 settings:
