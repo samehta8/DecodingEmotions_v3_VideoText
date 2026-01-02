@@ -44,13 +44,11 @@ groups:
 scales:
 - active: true
   type: "text"
-  title: "Emotions on display (Write multiple emotions, use any language (specify language)"
+  title: "Emotions on display (Write multiple emotions, use any language (specify language))"
   label_low: ""
   label_high: ""
-  slider_min: 0
-  slider_max: 100
   initial_state: "center"
-  required_to_proceed: false
+  required_to_proceed: true
   group: "emotions"
 
 - active: false
