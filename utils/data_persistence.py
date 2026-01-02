@@ -42,7 +42,7 @@ def save_user_data(user):
     # ONLINE: Write to Google Sheets
     if storage_mode in ['online', 'both']:
         try:
-            gsheets_success = append_user_to_gsheets(user_data, worksheet="users")
+            gsheets_success = append_user_to_gsheets(user_data, worksheet="v3_VideoText_users")
             if gsheets_success:
                 print(f"[INFO] ✓ User data saved to Google Sheets: {user.user_id}")
         except Exception as e:
@@ -123,7 +123,7 @@ def save_rating(user_id, action_id, scale_values):
     # ONLINE: Write to Google Sheets
     if storage_mode in ['online', 'both']:
         try:
-            gsheets_success = append_rating_to_gsheets(rating_data, worksheet="ratings")
+            gsheets_success = append_rating_to_gsheets(rating_data, worksheet="v3_VideoText_ratings")
             if gsheets_success:
                 print(f"[INFO] ✓ Rating saved to Google Sheets: {user_id}_{action_id}")
         except Exception as e:
@@ -162,7 +162,7 @@ def get_all_existing_user_ids():
     # Try Google Sheets first
     try:
         from utils.gsheets_manager import get_all_user_ids_from_gsheets
-        gsheets_ids = get_all_user_ids_from_gsheets(worksheet="users")
+        gsheets_ids = get_all_user_ids_from_gsheets(worksheet="v3_VideoText_users")
         user_ids.update(gsheets_ids)
         print(f"[INFO] Retrieved {len(gsheets_ids)} user IDs from Google Sheets")
     except Exception as e:
@@ -194,7 +194,7 @@ def user_exists(user_id):
     """
     # PRIMARY: Try Google Sheets first
     try:
-        if user_exists_in_gsheets(user_id, worksheet="users"):
+        if user_exists_in_gsheets(user_id, worksheet="v3_VideoText_users"):
             print(f"[INFO] User {user_id} found in Google Sheets")
             return True
     except Exception as e:
@@ -244,7 +244,7 @@ def get_rated_videos_for_user(user_id):
     """
     # PRIMARY: Try Google Sheets first
     try:
-        gsheets_ids = get_rated_videos_for_user_from_gsheets(user_id, worksheet="ratings")
+        gsheets_ids = get_rated_videos_for_user_from_gsheets(user_id, worksheet="v3_VideoText_ratings")
         if gsheets_ids:
             print(f"[INFO] Retrieved {len(gsheets_ids)} rated videos from Google Sheets for user {user_id}")
             return gsheets_ids

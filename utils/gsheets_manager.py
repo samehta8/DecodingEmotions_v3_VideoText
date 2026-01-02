@@ -76,7 +76,7 @@ def get_gspread_client():
     return _gspread_client
 
 
-def append_rating_to_gsheets(rating_data, worksheet="ratings"):
+def append_rating_to_gsheets(rating_data, worksheet="v3_VideoText_ratings"):
     """
     Append a single rating row to Google Sheets using true append (no overwrite).
 
@@ -157,7 +157,7 @@ def append_rating_to_gsheets(rating_data, worksheet="ratings"):
         return False
 
 
-def read_ratings_from_gsheets(worksheet="ratings"):
+def read_ratings_from_gsheets(worksheet="v3_VideoText_ratings"):
     """
     Read all ratings from Google Sheets.
 
@@ -181,7 +181,7 @@ def read_ratings_from_gsheets(worksheet="ratings"):
         return pd.DataFrame()
 
 
-def get_rated_videos_for_user_from_gsheets(user_id, worksheet="ratings"):
+def get_rated_videos_for_user_from_gsheets(user_id, worksheet="v3_VideoText_ratings"):
     """
     Get list of video IDs already rated by a specific user from Google Sheets (case-insensitive).
 
@@ -213,7 +213,7 @@ def get_rated_videos_for_user_from_gsheets(user_id, worksheet="ratings"):
         return []
 
 
-def append_user_to_gsheets(user_data, worksheet="users"):
+def append_user_to_gsheets(user_data, worksheet="v3_VideoText_users"):
     """
     Append a single user row to Google Sheets using true append (no overwrite).
 
@@ -294,7 +294,7 @@ def append_user_to_gsheets(user_data, worksheet="users"):
         return False
 
 
-def read_users_from_gsheets(worksheet="users"):
+def read_users_from_gsheets(worksheet="v3_VideoText_users"):
     """
     Read all users from Google Sheets.
 
@@ -318,7 +318,7 @@ def read_users_from_gsheets(worksheet="users"):
         return pd.DataFrame()
 
 
-def user_exists_in_gsheets(user_id, worksheet="users"):
+def user_exists_in_gsheets(user_id, worksheet="v3_VideoText_users"):
     """
     Check if a user exists in Google Sheets (case-insensitive).
 
@@ -345,7 +345,7 @@ def user_exists_in_gsheets(user_id, worksheet="users"):
         return False
 
 
-def get_all_user_ids_from_gsheets(worksheet="users"):
+def get_all_user_ids_from_gsheets(worksheet="v3_VideoText_users"):
     """
     Get all user IDs from Google Sheets.
 

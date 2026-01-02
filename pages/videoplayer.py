@@ -153,7 +153,7 @@ def display_video_with_mode(video_file_path, playback_mode='loop', video_width=N
     - video_file_path: Path to the local video file
     - playback_mode: 'loop' or 'once'
         - 'loop': Autoplay, loop enabled, controls visible
-        - 'once': Autoplay, no loop, no controls (plays once only)
+        - 'once': Play for 2 seconds, then stop at black first frame
     - video_width: Width of video in pixels (for centered display) or percentage string
     - enable_auto_advance: If True, trigger Streamlit rerun when video ends
     """
@@ -162,9 +162,7 @@ def display_video_with_mode(video_file_path, playback_mode='loop', video_width=N
         return
 
     if playback_mode == 'loop':
-        # Loop mode: autoplay with controls and looping
         if video_width:
-            # Centered with specified width
             col1, col2, col3 = st.columns([1, 2, 1])
             with col2:
                 st.video(video_file_path, autoplay=True, loop=True)
@@ -172,13 +170,10 @@ def display_video_with_mode(video_file_path, playback_mode='loop', video_width=N
             st.video(video_file_path, autoplay=True, loop=True)
 
     elif playback_mode == 'once':
-        # Once mode: autoplay without controls, no loop, plays once only
-        # Read video file and encode as base64
         with open(video_file_path, 'rb') as f:
             video_bytes = f.read()
         video_base64 = base64.b64encode(video_bytes).decode()
 
-        # Determine width style
         if video_width:
             if isinstance(video_width, str) and '%' in video_width:
                 width_style = f"width: {video_width};"
@@ -187,21 +182,6 @@ def display_video_with_mode(video_file_path, playback_mode='loop', video_width=N
         else:
             width_style = "max-width: 100%;"
 
-        # JavaScript to detect video end and trigger Streamlit rerun
-        auto_advance_script = ""
-        if enable_auto_advance:
-            auto_advance_script = """
-            video.addEventListener('ended', function() {
-                console.log('Video ended, triggering rerun...');
-                // Set a flag in sessionStorage to indicate video ended
-                window.parent.sessionStorage.setItem('video_ended', 'true');
-                // Trigger Streamlit to rerun by sending a custom event
-                window.parent.postMessage({type: 'streamlit:setComponentValue', value: 'ended'}, '*');
-            });
-            """
-
-        # Create HTML5 video player without controls
-        # Use object-fit: contain to ensure video is never cropped
         video_html = f"""
         <div style="width: 100%; height: 100vh; display: flex; align-items: center; justify-content: center; background: transparent;">
             <video
@@ -209,7 +189,6 @@ def display_video_with_mode(video_file_path, playback_mode='loop', video_width=N
                 autoplay
                 muted
                 style="{width_style} max-height: 85vh; height: auto; object-fit: contain;"
-                onended="this.pause();"
             >
                 <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
                 Your browser does not support the video tag.
@@ -225,14 +204,20 @@ def display_video_with_mode(video_file_path, playback_mode='loop', video_width=N
         </style>
         <script>
             const video = document.getElementById('main-video');
-            {auto_advance_script}
+            
+            video.addEventListener('timeupdate', function() {{
+                if (video.currentTime >= 2.0) {{
+                    video.pause();
+                    video.currentTime = 0;
+                }}
+            }});
         </script>
         """
         components.html(video_html, height=700)
 
     else:
-        # Fallback to default
         st.video(video_file_path)
+
 
 def show():
     """Display the video player screen."""
